@@ -61,7 +61,7 @@ class Form(val observable: Observable, bindingResource: Class<*>) {
         return dirty
     }
 
-    fun validateAll(withErrors: Boolean) {
+    fun validateAll() {
         fields.forEach {
             validate(it.key, false, false)
         }
@@ -114,6 +114,7 @@ class Form(val observable: Observable, bindingResource: Class<*>) {
         if (fields.containsKey(propId)) {
             throw Exception("$propId already added")
         }
+
         val propName = getProperty(propId)
         val value = getPropertyValue(propName)
         val field = Field(propId, propName, value, args)
