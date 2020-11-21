@@ -3,14 +3,16 @@ package hu.moksony.reactiveform.validator
 import hu.moksony.reactiveform.FieldControl
 import hu.moksony.reactiveform.FieldValidator
 import java.lang.Exception
+import javax.xml.validation.Validator
 
-class RegexMatch(message: String, withValue: String) : FieldValidator(message) {
-    val regex = Regex(withValue)
+class Min(val min: Int, message: String) : FieldValidator(message) {
     override fun validate(value: Any?, field: FieldControl): Boolean {
         return when (value) {
-            is String -> value.matches(regex)
+            is Int -> value >= min
+            "" -> validIfNotRequired(field)
+            is String -> value.toInt() >= min
             null -> validIfNotRequired(field)
-            else -> throw Exception("${this::class.java} can not validate ${value::class.java}")
+            else -> throw Exception("${field::class.java} not supported.")
         }
     }
 }

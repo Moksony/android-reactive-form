@@ -6,4 +6,5 @@
     <string name="min_length">Min length is %d</string>
     <string name="password_not_match">Passworn not match</string>
     <string name="not_match">Not match</string>
+    <string name="age_is_invalid">Age not valid</string>
 </resources>

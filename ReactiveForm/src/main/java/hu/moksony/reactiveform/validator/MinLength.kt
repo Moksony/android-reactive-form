@@ -1,11 +1,11 @@
 package hu.moksony.reactiveform.validator
 
-import hu.moksony.reactiveform.Field
-import hu.moksony.reactiveform.Validator
+import hu.moksony.reactiveform.FieldControl
+import hu.moksony.reactiveform.FieldValidator
 
-class MinLength(val min: Int, message: String) : Validator(message) {
+class MinLength(val min: Int, message: String) : FieldValidator(message) {
 
-    override fun validate(value: Any?, field: Field): Boolean {
+    override fun validate(value: Any?, field: FieldControl): Boolean {
         return when (value) {
             is String -> {
                 if (value.isEmpty()) {

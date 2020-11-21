@@ -1,10 +1,10 @@
 package hu.moksony.reactiveform
 
-class Field(
+class FieldControl(
     val propId: Int,
     val propName: String,
-    val initValue: Any?,
-    val validators: Array<out Validator>
+    var initValue: Any?,
+    val validators: Array<out FieldValidator>
 ) {
     var value: Any? = initValue
         set(value) {

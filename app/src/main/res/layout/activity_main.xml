@@ -10,91 +10,124 @@
             type="hu.moksony.reactiveformexample.RegisterForm" />
 
         <variable
-            name="validator"
-            type="hu.moksony.reactiveform.Form" />
+            name="formControl"
+            type="hu.moksony.reactiveform.FormControl" />
     </data>
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="12dp"
-        tools:context=".MainActivity">
+        android:layout_height="match_parent">
 
-        <com.google.android.material.textfield.TextInputLayout
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Username"
-            app:error="@{validator.errors.username}"
-            app:errorEnabled="true">
+            android:orientation="vertical"
+            android:padding="12dp"
+            tools:context=".MainActivity">
 
-            <com.google.android.material.textfield.TextInputEditText
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@={form.username}" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:hint="Username"
+                app:error="@{formControl.errors.username}"
+                app:errorEnabled="true">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="E-mail"
-            app:error="@{validator.errors.email}"
-            app:errorEnabled="true">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@={form.username}" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputEditText
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:text="@={form.email}" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:hint="E-mail"
+                app:error="@{formControl.errors.email}"
+                app:errorEnabled="true">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Jelszó"
-            app:error="@{validator.errors.password}"
-            app:errorEnabled="true">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress"
+                    android:text="@={form.email}" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputEditText
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:text="@={form.password}" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:hint="Jelszó"
+                app:error="@{formControl.errors.password}"
+                app:errorEnabled="true">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Jelszó mégegyszer"
-            app:error="@{validator.errors.confirmPassword}"
-            app:errorEnabled="true">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:text="@={form.password}" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputEditText
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:text="@={form.confirmPassword}" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:hint="Jelszó mégegyszer"
+                app:error="@{formControl.errors.confirmPassword}"
+                app:errorEnabled="true">
 
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="@={form.policyAccepted}"
-            android:text="Privacy policy" />
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:text="@={form.confirmPassword}" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_register"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:enabled="@{validator.isValid}"
-            android:text="Register" />
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="@={form.policyAccepted}"
+                android:text="Privacy policy" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_update"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:enabled="@{validator.isDirty}"
-            android:text="Update" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                >
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Children"
+                android:layout_centerVertical="true"
+                android:textAppearance="?textAppearanceHeadline6" />
 
-    </androidx.appcompat.widget.LinearLayoutCompat>
+                <com.google.android.material.button.MaterialButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/btn_add"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:text="Add"
+                    android:layout_alignParentEnd="true"
+                    />
+            </RelativeLayout>
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/children_holder"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_height="wrap_content">
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_register"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="@{formControl.isValid}"
+                android:text="Register" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_update"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="@{formControl.isDirty}"
+                android:text="Update" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </ScrollView>
 </layout>

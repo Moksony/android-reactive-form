@@ -6,13 +6,23 @@ import androidx.databinding.ObservableArrayMap
 import androidx.databinding.ObservableField
 import java.lang.Exception
 
-class Form(val observable: Observable, bindingResource: Class<*>) {
+class FormControl(val observable: Observable, bindingResource: Class<*>) {
 
     var firstErrorOnly: Boolean = true
     var triggerErrorOnNotTouchedField = false
 
-    val fields = mutableMapOf<Int, Field>()
+    val fields = mutableMapOf<Int, FieldControl>()
 
+    var _isValid: Boolean = true
+        set(value) {
+            field = value
+            isValid.set(value)
+        }
+    var _isDirty: Boolean = false
+        set(value) {
+            field = value
+            isDirty.set(value)
+        }
     var isValid = ObservableField(true)
 
     val isDirty = ObservableField(false)
@@ -21,6 +31,9 @@ class Form(val observable: Observable, bindingResource: Class<*>) {
 
     val errors = ObservableArrayMap<String, String>()
 
+    var subControls = mutableListOf<FormControl>()
+
+    var parent: FormControl? = null
 
     init {
         bindingResource.declaredFields.forEach { field ->
@@ -48,17 +61,21 @@ class Form(val observable: Observable, bindingResource: Class<*>) {
         return observable::class.java.getMethod("get" + property.capitalize()).invoke(observable)
     }
 
+
     fun checkFromValid(): Boolean {
         val valid = this.fields.values.all { it.isValid }
-        this.isValid.set(valid)
-        return valid
+        val subValid = this.subControls.all { it._isValid }
+        return valid && subValid
     }
 
     fun checkDirty(): Boolean {
         val dirtyItem = this.fields.values.find { it.isDirty }
-        val dirty = dirtyItem != null
-        this.isDirty.set(dirty)
-        return dirty
+        if (subControls.size > 0) {
+            val subDirtyItem = this.subControls.find { it._isDirty }
+            return subDirtyItem != null || dirtyItem != null
+        } else {
+            return dirtyItem != null
+        }
     }
 
     fun validateAll() {
@@ -68,9 +85,24 @@ class Form(val observable: Observable, bindingResource: Class<*>) {
         checkForm()
     }
 
+    fun build(): FormControl {
+        checkForm()
+        return this
+    }
+
     fun checkForm() {
-        checkFromValid()
-        checkDirty()
+        val valid = checkFromValid()
+        val dirty = checkDirty()
+
+        _isValid = valid
+        _isDirty = dirty
+
+        parent?.let { p ->
+            if ((p._isValid != _isValid) || (p._isDirty != _isDirty)) {
+                //notify parent to check
+                p.onSubFormControlChanged(this)
+            }
+        }
     }
 
     //update field isValid & collect errors
@@ -110,19 +142,50 @@ class Form(val observable: Observable, bindingResource: Class<*>) {
         }
     }
 
-    fun addField(propId: Int, vararg args: Validator): Field {
+    fun addField(propId: Int, vararg args: FieldValidator): FieldControl {
         if (fields.containsKey(propId)) {
             throw Exception("$propId already added")
         }
 
         val propName = getProperty(propId)
         val value = getPropertyValue(propName)
-        val field = Field(propId, propName, value, args)
+        val field = FieldControl(propId, propName, value, args)
 
         fields[propId] = field
         errors[propName] = null
 
         field.isValid = field.getErrors() == null
         return field
+    }
+
+    fun addControl(control: FormControl) {
+        control.parent = this
+        subControls.add(control)
+        checkForm()
+    }
+
+    fun removeControl(control: FormControl) {
+        val index = this.subControls.indexOf(control)
+        if (index == -1) {
+            throw Exception("FormControl not found.")
+        }
+        this.subControls.removeAt(index)
+        control.parent = null
+        this.checkForm()
+    }
+
+    fun snapshotValues() {
+        this.subControls.forEach { formControl ->
+            formControl.snapshotValues()
+        }
+
+        this.fields.forEach {
+            it.value.initValue = getPropertyValue(it.value.propName)
+        }
+        checkForm()
+    }
+
+    private fun onSubFormControlChanged(formControl: FormControl) {
+        this.checkForm()
     }
 }
