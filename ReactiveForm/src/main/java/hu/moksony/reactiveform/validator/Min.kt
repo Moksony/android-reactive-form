@@ -9,6 +9,9 @@ class Min(val min: Int, message: String) : FieldValidator(message) {
     override fun validate(value: Any?, field: FieldControl): Boolean {
         return when (value) {
             is Int -> value >= min
+            is Long -> value >= min
+            is Float -> value >= min
+            is Double -> value >= min
             "" -> validIfNotRequired(field)
             is String -> value.toInt() >= min
             null -> validIfNotRequired(field)

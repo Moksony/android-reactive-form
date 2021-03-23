@@ -12,6 +12,7 @@
         <variable
             name="formControl"
             type="hu.moksony.reactiveform.FormControl" />
+        <import type="android.view.View"/>
     </data>
 
     <ScrollView
@@ -80,14 +81,22 @@
                     android:text="@={form.confirmPassword}" />
             </com.google.android.material.textfield.TextInputLayout>
 
+
             <com.google.android.material.checkbox.MaterialCheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="@={form.policyAccepted}"
                 android:text="Privacy policy" />
 
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="@={form.hasChild}"
+                android:text="Has child?" />
+
             <RelativeLayout
                 android:layout_width="match_parent"
+                android:visibility="@{form.hasChild? View.VISIBLE: View.GONE}"
                 android:layout_height="wrap_content"
                 >
             <com.google.android.material.textview.MaterialTextView
@@ -106,6 +115,12 @@
                     android:layout_alignParentEnd="true"
                     />
             </RelativeLayout>
+            <androidx.appcompat.widget.AppCompatTextView
+                style="?errorTextAppearance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{formControl.errors.child}"
+                />
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/children_holder"
                 android:layout_width="match_parent"

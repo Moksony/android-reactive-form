@@ -142,18 +142,34 @@ class FormControl(val observable: Observable, bindingResource: Class<*>) {
         }
     }
 
-    fun addField(propId: Int, vararg args: FieldValidator): FieldControl {
+    fun add(propId: Int, vararg args: FieldValidator): FieldControl {
         if (fields.containsKey(propId)) {
             throw Exception("$propId already added")
         }
 
         val propName = getProperty(propId)
         val value = getPropertyValue(propName)
-        val field = FieldControl(propId, propName, value, args)
+        val field = FieldControl(propId, propName, value, *args.toMutableList())
 
         fields[propId] = field
         errors[propName] = null
 
+        field.isValid = field.getErrors() == null
+        return field
+    }
+
+    fun addField(field: FieldControl) {
+        this.fields[field.propId] = field
+    }
+
+    fun removeField(field: FieldControl) {
+        this.fields.remove(field.propId)
+    }
+
+    fun createField(propId: Int, vararg args: FieldValidator): FieldControl {
+        val propName = getProperty(propId)
+        val value = getPropertyValue(propName)
+        val field = FieldControl(propId, propName, value, *args.toMutableList())
         field.isValid = field.getErrors() == null
         return field
     }

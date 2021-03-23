@@ -9,6 +9,9 @@ class Max(val max: Int, message: String) : FieldValidator(message) {
     override fun validate(value: Any?, field: FieldControl): Boolean {
         return when (value) {
             is Int -> value <= max
+            is Long -> value <= max
+            is Float -> value <= max
+            is Double -> value <= max
             "" -> validIfNotRequired(field)
             is String -> value.toInt() <= max
             null -> validIfNotRequired(field)

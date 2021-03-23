@@ -48,6 +48,14 @@ class RegisterForm : BaseObservable() {
                 notifyPropertyChanged(BR.policyAccepted)
             }
         }
+    @Bindable
+    var hasChild: Boolean? = null
+    set(value) {
+        if(field != value){
+            field = value
+            notifyPropertyChanged(BR.hasChild)
+        }
+    }
 
     @Bindable
     var child = mutableListOf<ChildForm>()

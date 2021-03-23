@@ -3,6 +3,7 @@ package hu.moksony.reactiveformexample
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
+import androidx.databinding.Observable
 import hu.moksony.reactiveform.FormControl
 import hu.moksony.reactiveform.validator.*
 import hu.moksony.reactiveformexample.databinding.ActivityMainBinding
@@ -21,16 +22,16 @@ class MainActivity : AppCompatActivity() {
 
 
         formControl = FormControl(form, BR::class.java).apply {
-            addField(
+            add(
                 BR.username,
                 Required(getString(R.string.required)),
                 MinLength(3, getString(R.string.username_min_length, 3))
             )
-            addField(
+            add(
                 BR.email,
                 Email(getString(R.string.not_valid_email))
             )
-            addField(
+            add(
                 BR.password,
                 Required(getString(R.string.required)),
                 MinLength(6, getString(R.string.min_length, 6))
@@ -38,23 +39,44 @@ class MainActivity : AppCompatActivity() {
                 triggerFields = arrayOf(BR.confirmPassword)
             }
 
-            addField(
+            add(
                 BR.confirmPassword,
                 Required(getString(R.string.required)),
                 MatchWith(this.fields[BR.password]!!, getString(R.string.password_not_match))
             )
-            addField(
+            add(
                 BR.policyAccepted,
                 MatchExactly(true, getString(R.string.not_match))
 
             )
-            addField(
-                BR.child,
-//                Required("At least one child required"),
-//                MinLength(1, "At least one child required")
-            )
+            add(BR.hasChild)
         }
             .build()
+
+        val field = formControl.createField(
+            BR.child,
+            Required("At least one child required"),
+            MinLength(1, "At least one child required")
+        )
+
+        val onPropChangeListener = object : Observable.OnPropertyChangedCallback() {
+            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
+                when (propertyId) {
+                    BR.hasChild -> {
+                        formControl.apply {
+                            if (form.hasChild == true) {
+                                   addField(field)
+                            } else {
+                                   removeField(field)
+                            }
+                            formControl.checkForm()
+                        }
+                    }
+                }
+            }
+        }
+
+        form.addOnPropertyChangedCallback(onPropChangeListener)
 
         binding.form = form
         binding.formControl = formControl
@@ -71,21 +93,22 @@ class MainActivity : AppCompatActivity() {
     fun addChild() {
         val childForm = ChildForm()
         val childControl = FormControl(childForm, BR::class.java).apply {
-            addField(
+            add(
                 BR.firstName,
                 Required(getString(R.string.required)),
                 MinLength(3, getString(R.string.min_length, 3))
             )
-            addField(
+            add(
                 BR.lastName,
                 Required(getString(R.string.required)),
                 MinLength(3, getString(R.string.min_length, 3))
             )
-            addField(
+            add(
                 BR.age,
                 Required(getString(R.string.required)),
                 Min(0, getString(R.string.age_is_invalid))
             )
+
         }
             .build()
         this.form.child.add(childForm)
