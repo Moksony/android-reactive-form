@@ -1,11 +1,11 @@
 Android Reactive forms
 ===============
 
-This library based on android DataBinding .
+This library based on android DataBinding.
 
-## Examples
-###Simple login form validator
-#### Create a login model
+# Examples
+## Simple login
+### Create a login model
 ```kotlin
 class LoginModel : BaseObservable() {
     @Bindable
@@ -27,13 +27,13 @@ class LoginModel : BaseObservable() {
     }
 }
 ```
-#### Create Reactive form
+### Create Reactive form
 ```kotlin
  val loginModel = LoginModel()
  val formControl = FormControl(null, BR::class.java).apply{
-
-	add(BR.username,Required(
-		Required("Required field"),
+	add(
+	    BR.username,
+	    Required(Required("Required field"),
 		MinLength(3, "Username min length is 3 character")
 	)
 	add(
@@ -43,7 +43,7 @@ class LoginModel : BaseObservable() {
 	)
 }
 ```
-#### Bind model & formcontrol
+### Bind model & formcontrol
 In your activity/fragment
 ```kotlin
 binding.model = loginModel
@@ -68,7 +68,7 @@ XML
             android:enabled="@{formControl.isValid}"
             android:text="Login" />
 ```
-#### DONE
+### DONE
 
 
 
