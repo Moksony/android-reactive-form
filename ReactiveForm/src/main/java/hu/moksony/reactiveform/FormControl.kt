@@ -6,7 +6,15 @@ import androidx.databinding.ObservableArrayMap
 import androidx.databinding.ObservableField
 import java.lang.Exception
 
-class FormControl(val observable: Observable, bindingResource: Class<*>) {
+class FormControl(observable: Observable?, bindingResource: Class<*>) {
+
+    var observable: Observable? = observable
+        get() = field
+        set(value) {
+            val prevValue = field
+            field = value
+            changeObserver(prevValue, value)
+        }
 
     var firstErrorOnly: Boolean = true
     var triggerErrorOnNotTouchedField = false
@@ -35,21 +43,28 @@ class FormControl(val observable: Observable, bindingResource: Class<*>) {
 
     var parent: FormControl? = null
 
+    private val propertyCallback = object : Observable.OnPropertyChangedCallback() {
+        override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
+            val propName = brFields[propertyId]
+            Log.d("FROM", "[$propertyId] $propName changed")
+            validate(propertyId)
+        }
+    }
+
     init {
         bindingResource.declaredFields.forEach { field ->
             field.isAccessible = true
             val genBr: Int = field.getInt(null)
             brFields[genBr] = field.name
         }
+        observable?.addOnPropertyChangedCallback(propertyCallback)
+    }
 
-        observable
-            .addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback() {
-                override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
-                    val propName = brFields[propertyId]
-                    Log.d("FROM", "[$propertyId] $propName changed")
-                    validate(propertyId)
-                }
-            })
+    private fun changeObserver(prev: Observable?, next: Observable?) {
+        prev?.removeOnPropertyChangedCallback(propertyCallback)
+        next?.addOnPropertyChangedCallback(propertyCallback)
+        snapshotValues()
+        checkForm()
     }
 
     private fun getProperty(fieldId: Int): String {
@@ -58,14 +73,20 @@ class FormControl(val observable: Observable, bindingResource: Class<*>) {
 
     //Get the actual value of the property using the field getter: get+FieldName
     private fun getPropertyValue(property: String): Any? {
-        return observable::class.java.getMethod("get" + property.capitalize()).invoke(observable)
+        val currentObservable = this.observable
+        if (currentObservable != null) {
+            return currentObservable::class
+                .java.getMethod("get" + property.capitalize())
+                .invoke(observable)
+        }
+        return null
     }
 
 
     fun checkFromValid(): Boolean {
         val valid = this.fields.values.all { it.isValid }
         val subValid = this.subControls.all { it._isValid }
-        return valid && subValid
+        return valid && subValid && observable != null
     }
 
     fun checkDirty(): Boolean {
@@ -146,24 +167,19 @@ class FormControl(val observable: Observable, bindingResource: Class<*>) {
         if (fields.containsKey(propId)) {
             throw Exception("$propId already added")
         }
-
-        val propName = getProperty(propId)
-        val value = getPropertyValue(propName)
-        val field = FieldControl(propId, propName, value, *args.toMutableList())
-
-        fields[propId] = field
-        errors[propName] = null
-
-        field.isValid = field.getErrors() == null
+        val field = this.createField(propId, *args)
+        this.addField(field)
         return field
     }
 
     fun addField(field: FieldControl) {
         this.fields[field.propId] = field
+        this.errors[field.propName] = null
     }
 
     fun removeField(field: FieldControl) {
         this.fields.remove(field.propId)
+        this.errors.remove(field.propName)
     }
 
     fun createField(propId: Int, vararg args: FieldValidator): FieldControl {
@@ -190,13 +206,17 @@ class FormControl(val observable: Observable, bindingResource: Class<*>) {
         this.checkForm()
     }
 
+    //call this to set default values to current
     fun snapshotValues() {
         this.subControls.forEach { formControl ->
             formControl.snapshotValues()
         }
 
         this.fields.forEach {
-            it.value.initValue = getPropertyValue(it.value.propName)
+            val propValue = getPropertyValue(it.value.propName)
+            val field = it.value
+            field.initValue = propValue
+            field.value = propValue
         }
         checkForm()
     }

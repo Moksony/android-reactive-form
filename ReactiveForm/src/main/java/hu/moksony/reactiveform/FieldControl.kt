@@ -12,6 +12,7 @@ class FieldControl(
     var initValue: Any?,
     val validators: MutableList<FieldValidator>
 ) : BaseObservable() {
+
     var value: Any? = initValue
         set(value) {
             if (field != value) {
@@ -30,6 +31,7 @@ class FieldControl(
     var enabled: Boolean? = null
 
     val isDirty: Boolean
+    @Bindable
         get() {
             return !comperator.isSame(initValue, value)
         }

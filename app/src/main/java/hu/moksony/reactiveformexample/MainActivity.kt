@@ -18,10 +18,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding =
-            DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
+            DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-
-        formControl = FormControl(form, BR::class.java).apply {
+        formControl = FormControl(null, BR::class.java).apply {
             add(
                 BR.username,
                 Required(getString(R.string.required)),
@@ -53,6 +52,10 @@ class MainActivity : AppCompatActivity() {
         }
             .build()
 
+        binding.root.postDelayed({
+            formControl.observable = form
+        }, 2000)
+
         val field = formControl.createField(
             BR.child,
             Required("At least one child required"),
@@ -65,9 +68,9 @@ class MainActivity : AppCompatActivity() {
                     BR.hasChild -> {
                         formControl.apply {
                             if (form.hasChild == true) {
-                                   addField(field)
+                                addField(field)
                             } else {
-                                   removeField(field)
+                                removeField(field)
                             }
                             formControl.checkForm()
                         }

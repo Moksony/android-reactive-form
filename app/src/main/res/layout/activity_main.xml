@@ -25,6 +25,16 @@
             android:orientation="vertical"
             android:padding="12dp"
             tools:context=".MainActivity">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@{`Form dirty: `+ formControl.isDirty}"
+                    />
+            </LinearLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
