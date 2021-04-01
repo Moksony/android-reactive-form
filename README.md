@@ -34,12 +34,12 @@ class LoginModel : BaseObservable() {
 	add(
 	    BR.username,
 	    Required(Required("Required field"),
-		MinLength(3, "Username min length is 3 character")
+	    MinLength(3, "Username min length is 3 character")
 	)
 	add(
-		BR.password,
-		Required("Required field"),
-		MinLength(6, "Passworn min length is 6 character")
+	    BR.password,
+	    Required("Required field"),
+	    MinLength(6, "Passworn min length is 6 character")
 	)
 }
 ```
